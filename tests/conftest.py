@@ -21,10 +21,13 @@ class AuthenticatedClient(FlaskClient): # pylint: disable=C0115
             headers = Headers()
         elif not isinstance(headers, Headers):
             headers = Headers(headers)
-        headers.extend(Headers({
-            "Authorization": f"Basic {self._credentials}"
-        }))
-        kwargs['headers'] = headers
+        credentials = kwargs.pop('credentials', self._credentials)
+        disable_auth = kwargs.pop('disable_auth', False)
+        if not disable_auth:
+            headers.extend(Headers({
+                "Authorization": f"Basic {credentials}"
+            }))
+            kwargs['headers'] = headers
         return super().open(*args, **kwargs)
 
 

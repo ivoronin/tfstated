@@ -38,3 +38,13 @@ def test_lock(client): # pylint: disable=C0116
 
     response = client.open('/state', method='UNLOCK')
     assert response.status_code == 404
+
+def test_auth(client): # pylint: disable=C0116
+    response = client.get('/state')
+    assert response.status_code != 401
+
+    response = client.get('/state', credentials='wrong-data')
+    assert response.status_code == 401
+
+    response = client.get('/state', disable_auth=True)
+    assert response.status_code == 401
