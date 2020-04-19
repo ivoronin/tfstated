@@ -46,7 +46,7 @@ def state_fetch(): # pylint: disable=C0116
 @auth.login_required
 def state_update(): # pylint: disable=C0116
     try:
-        tmp_dir = os.path.dirname(app.config['STATE_FILE'])
+        tmp_dir = app.config['DATA_DIR']
         tmp_prefix = "%s." % os.path.basename(app.config['STATE_FILE'])
         (tmp_fd, tmp_name) = tempfile.mkstemp(prefix=tmp_prefix, dir=tmp_dir)
         os.write(tmp_fd, request.data)
