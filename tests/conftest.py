@@ -1,0 +1,41 @@
+# pylint: disable=C0114
+from base64 import b64encode
+import os
+import tempfile
+import pytest
+from flask.testing import FlaskClient
+from werkzeug.datastructures import Headers
+from tfstated import create_app
+
+class AuthenticatedClient(FlaskClient): # pylint: disable=C0115
+    def __init__(self, *args, **kwargs):
+        username = kwargs.pop('username')
+        password = kwargs.pop('password')
+        self._credentials = b64encode(f'{username}:{password}'.encode('utf-8')).decode('utf-8')
+        super().__init__(*args, **kwargs)
+
+    def open(self, *args, **kwargs):
+        headers = kwargs.pop('headers', Headers())
+        # https://github.com/pallets/werkzeug/blob/master/src/werkzeug/test.py
+        if headers is None:
+            headers = Headers()
+        elif not isinstance(headers, Headers):
+            headers = Headers(headers)
+        headers.extend(Headers({
+            "Authorization": f"Basic {self._credentials}"
+        }))
+        kwargs['headers'] = headers
+        return super().open(*args, **kwargs)
+
+
+@pytest.fixture
+def client(): # pylint: disable=C0116
+    with tempfile.TemporaryDirectory() as data_dir:
+        os.environ['TFSTATED_DATA_DIR'] = data_dir
+        app = create_app()
+        app.test_client_class = AuthenticatedClient
+        with app.app_context():
+            username = app.config['USERNAME']
+            password = app.config['PASSWORD']
+        with app.test_client(username=username, password=password) as test_client:
+            yield test_client
