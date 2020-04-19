@@ -39,7 +39,7 @@ def state_fetch(): # pylint: disable=C0116
     except OSError as exc:
         if exc.errno == errno.ENOENT:
             return ('Not Found\n', 404)
-        bp.logger.error('Error sending %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
+        app.logger.error('Error sending %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
         abort(500)
 
 @bp.route('/state', methods=['POST'])
@@ -54,7 +54,7 @@ def state_update(): # pylint: disable=C0116
         os.close(tmp_fd)
         os.rename(tmp_name, app.config['STATE_FILE'])
     except OSError as exc:
-        bp.logger.error('Error saving data to state file %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
+        app.logger.error('Error saving data to state file %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
         abort(500)
 
     return ('Created\n', 200)
@@ -67,7 +67,7 @@ def state_purge(): # pylint: disable=C0116
     except OSError as exc:
         if exc.errno == errno.ENOENT:
             return('Not Found\n', 404)
-        bp.logger.error('Error deleting %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
+        app.logger.error('Error deleting %s: %s', app.config['STATE_FILE'], exc) # pylint: disable=E1101
         abort(500)
 
     return ('Deleted\n', 200)
@@ -82,7 +82,7 @@ def state_lock(): # pylint: disable=C0116
     except OSError as exc:
         if exc.errno == errno.EEXIST:
             return('Conflict\n', 409)
-        bp.logger.error('Error locking file %s: %s', app.config['LOCK_FILE'], exc) # pylint: disable=E1101
+        app.logger.error('Error locking file %s: %s', app.config['LOCK_FILE'], exc) # pylint: disable=E1101
         abort(500)
 
     return ('Locked\n', 200)
@@ -95,7 +95,7 @@ def state_unlock(): # pylint: disable=C0116
     except OSError as exc:
         if exc.errno == errno.ENOENT:
             return('Not Found\n', 404)
-        bp.logger.error('Error unlocking file %s: %s', app.config['LOCK_FILE'], exc) # pylint: disable=E1101
+        app.logger.error('Error unlocking file %s: %s', app.config['LOCK_FILE'], exc) # pylint: disable=E1101
         abort(500)
 
     return ('Unlocked\n', 200)
