@@ -48,3 +48,7 @@ def test_auth(client): # pylint: disable=C0116
 
     response = client.get('/state', disable_auth=True)
     assert response.status_code == 401
+
+def test_health(client): # pylint: disable=C0116
+    response = client.get('/healthz')
+    assert response.status_code == 200

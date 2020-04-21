@@ -2,7 +2,7 @@
 import os
 import os.path
 from flask import Flask
-from tfstated import state
+from tfstated import state, health
 
 def create_app(): # pylint: disable=C0116
     app = Flask(__name__)
@@ -20,4 +20,5 @@ def create_app(): # pylint: disable=C0116
     )
 
     app.register_blueprint(state.bp)
+    app.register_blueprint(health.bp)
     return app
